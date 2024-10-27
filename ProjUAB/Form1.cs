@@ -26,10 +26,18 @@ namespace ProjUAB
             InitializeDataGridView(dataGridView1);
             InitializeDataGridView(dataGridView2);
 
+            string tramesesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "trameses.csv");
+            string notesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "notes.csv");
+            string activitatsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "activitats.csv");
+
+            LoadDataFromCSV(tramesesPath, dataTable, dataTramesa, ',');
+            LoadDataFromCSV(notesPath, dataTableNotas, dataNotes, ';');
+            LoadDataFromCSV(activitatsPath, dataTableActivitats, dataActivitats, ',');
+
             // Cargar los datos sin retorno booleano
-            LoadDataFromCSV(@"C:\Users\Alex\Downloads\arxiu\trameses.csv", dataTable, dataTramesa, ',');
-            LoadDataFromCSV(@"C:\Users\Alex\Downloads\arxiu\notes.csv", dataTableNotas, dataNotes, ';');
-            LoadDataFromCSV(@"C:\Users\Alex\Downloads\arxiu\activitats.csv", dataTableActivitats, dataActivitats, ',');
+            // LoadDataFromCSV(@"C:\Users\Alex\Downloads\arxiu\trameses.csv", dataTable, dataTramesa, ',');
+            // LoadDataFromCSV(@"C:\Users\Alex\Downloads\arxiu\notes.csv", dataTableNotas, dataNotes, ';');
+            // LoadDataFromCSV(@"C:\Users\Alex\Downloads\arxiu\activitats.csv", dataTableActivitats, dataActivitats, ',');
 
             DisplayDataSetContents(dataNotes);
 
@@ -207,6 +215,17 @@ namespace ProjUAB
 
             List<decimal> valoresPracticas = Sigma(dataTramesa, "UserData", "grade");
 
+            processSigma(valoresP_Grade, valoresF_Grade, valoresR_Grade);
+
+            alphaLabel.Text = alpha.ToString();
+
+            /*var (partialMean, finalMean, sumOfMeans) = CalculateGrades(valoresP_Grade, valoresF_Grade);
+
+            Console.WriteLine($"Partial Mean: {partialMean}");
+            Console.WriteLine($"Final Mean: {finalMean}");
+            Console.WriteLine($"Sum of Means: {sumOfMeans}");
+            */
+
         }
 
         private void ShowCheckedList(TextBox txtUserId, DataSet dataSet, DataGridView dataGridView, CheckedListBox checkedListBox, string dataName)
@@ -292,6 +311,8 @@ namespace ProjUAB
             }
         }
 
+
+        //Gets info from specific column and puts it on a list (NESTING TO BE SOLVED WITH INVERSION OF CONDITIONALS)
         private List<decimal> Sigma(DataSet dataSet, string tableName, string columnName)
         {
             List<decimal> valuesList = new List<decimal>();
@@ -309,10 +330,25 @@ namespace ProjUAB
                     {
                         object cellValue = row[columnName];
 
-                        // Añadir el valor a la lista como string
-                        valuesList.Add(decimal.Parse(cellValue.ToString()));
+                        // Comprobar que el valor no sea nulo ni vacío antes de intentar convertirlo
+                        if (cellValue != DBNull.Value && !string.IsNullOrWhiteSpace(cellValue.ToString()))
+                        {
+                            // Intentar convertir el valor a decimal
+                            if (decimal.TryParse(cellValue.ToString(), out decimal parsedValue))
+                            {
+                                valuesList.Add(parsedValue);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Valor no numérico o inválido encontrado en '{columnName}': {cellValue}");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Valor nulo encontrado en '{columnName}' y será omitido.");
+                        }
                     }
-                    Console.WriteLine(valuesList.ToString());
+                    Console.WriteLine("Lista de valores procesados: " + string.Join(", ", valuesList)); // Imprimir valores de la lista
                 }
                 else
                 {
@@ -327,10 +363,9 @@ namespace ProjUAB
             return valuesList;
         }
 
-
         public decimal alpha = 1;
 
-        public decimal processSigma(List<decimal> valuesP, List<decimal> valuesF, List<decimal> valuesR)
+        public void processSigma(List<decimal> valuesP, List<decimal> valuesF, List<decimal> valuesR)
         {
             if (valuesR.Count != 0)
             {
@@ -344,8 +379,24 @@ namespace ProjUAB
                 alpha = alpha + ((valuesF[valuesF.Count-1] - valuesP[valuesP.Count - 1]) / 10) * 0.75m;
             }
 
+        }
 
-            return 0m;
+        public static (decimal? PartialMean, decimal? FinalMean, decimal? SumOfMeans) CalculateGrades(List<decimal?> partialGrades, List<decimal?> finalGrades)
+        {
+            // Filter out null values and select the decimal values
+            var validPartialGrades = partialGrades.Where(grade => grade.HasValue).Select(grade => grade.Value);
+            var validFinalGrades = finalGrades.Where(grade => grade.HasValue).Select(grade => grade.Value);
+
+            // Calculate the mean for both lists
+            decimal? partialMean = validPartialGrades.Any() ? validPartialGrades.Average() : (decimal?)null;
+            decimal? finalMean = validFinalGrades.Any() ? validFinalGrades.Average() : (decimal?)null;
+
+            // Calculate the sum of both means, ensuring both are not null
+            decimal? sumOfMeans = (partialMean.HasValue && finalMean.HasValue)
+                ? (partialMean.Value + finalMean.Value)
+                : (decimal?)null;
+
+            return (partialMean, finalMean, sumOfMeans);
         }
     }
 }

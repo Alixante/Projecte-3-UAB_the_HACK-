@@ -36,6 +36,7 @@
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.checkedListBox2 = new System.Windows.Forms.CheckedListBox();
+            this.alphaLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.SuspendLayout();
@@ -113,11 +114,21 @@
             this.checkedListBox2.Size = new System.Drawing.Size(194, 188);
             this.checkedListBox2.TabIndex = 7;
             // 
+            // alphaLabel
+            // 
+            this.alphaLabel.AutoSize = true;
+            this.alphaLabel.Location = new System.Drawing.Point(220, 34);
+            this.alphaLabel.Name = "alphaLabel";
+            this.alphaLabel.Size = new System.Drawing.Size(51, 20);
+            this.alphaLabel.TabIndex = 8;
+            this.alphaLabel.Text = "label1";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1378, 744);
+            this.Controls.Add(this.alphaLabel);
             this.Controls.Add(this.checkedListBox2);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.dataGridView2);
@@ -146,6 +157,7 @@
         private System.Windows.Forms.DataGridView dataGridView2;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.CheckedListBox checkedListBox2;
+        private System.Windows.Forms.Label alphaLabel;
     }
 }
 

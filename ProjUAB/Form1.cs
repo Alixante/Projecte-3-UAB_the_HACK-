@@ -138,7 +138,7 @@ namespace ProjUAB
             }
             else
             {
-                MessageBox.Show("Inser an ID");
+                MessageBox.Show("Insert an ID");
             }
 
 
